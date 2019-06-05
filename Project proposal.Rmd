@@ -1,0 +1,41 @@
+---
+title: "Project proposal"
+
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+# The Big Picture Question
+To better understand how to treat genetic disorders or diseased states, it is important to determine which genes or proteins should be targeted. These targets can be identified by uncovering changes in their expression levels when compared with unaffected individuals. Down Syndrome, or Trisomy 21, which results from an extra copy of chromosome 21, affects approximately 1 in every 700 babies born each year in the United States (ref). The genetic aberrations associated with Down Syndrome can delay the individual’s development, cause deficits in learning and memory, lead to a higher prevalence of early-onset neurodegenerative disorders, such as Alzheimer’s disease. The proteins and molecular mechanisms that underlie these nervous system defects could serve as potential therapeutic targets. This project proposes to identify these proteins.
+
+# The Client and Why is this important?
+
+By understanding how the proteins and molecular pathways that influence learning and memory are affected by Trisomy 21, the clients (i.e., academic institutions, research hospitals and centers, and pharmaceutical companies) could pursue research on novel pharmacotherapies within the lab and ultimately in clinical trials. Identifying proteins, whose expression levels have changed in Trisomy 21, could give way to developing drugs that could ameliorate learning and memory defects associated with Trisomy 21. This research could be extended to other developmental disorders that affect learning and memory and could provide new avenues of therapies for neurodegenerative disorders that influence memory, such as Alzheimer’s disease.
+
+# The Data
+
+Protein expression [data](http://archive.ics.uci.edu/ml/datasets/Mice+Protein+Expression) was collected from wild-type mice and a mouse model for Trisomy 21 (Ts65Dn). These data, were donated by Dr. Clara Higuera (University Complutense, Madrid, Spain), Dr. Katheleen Gardiner (University of Colorado, Colorado), and Dr. Krzysztof J. Cios (Virginia Commonwealth University, Virginia), and which are available through the UCI Machine Learning Repository. 
+
+The mice in the study underwent one of two learning treatments and were treated with or without memantine, which is an antagonist for the N-methyl-D-aspartate (NMDA) receptor. The NMDA receptor is important for regulating the activity of neurons, and memantine has previously been shown to rescue the performance on learning and memory tasks in Ts65Dn mice. 
+
+The dataset includes 8 groups of mice (105-150 mice per group). Wild-type and Ts65n mutant mice were given injections of either saline or memantine. Fifteen minutes after injection, the mice were placed in one of two behavioral assays. One of the assays was the context-shock (CS) assay, where the mice were placed in a novel cage, allowed to explore for 3 minutes, and then given an electric shock. These mice learned to associate the new environment with the aversive stimulus. The other assay was the shock-context (SC) assay, where the mice were placed in the novel cage, immediately given a shock, and then allowed to explore for 3 minutes. These mice do not develop a conditioned fear like the CS groups. From these assays, the groups of mice can be divided into those that learn and those that do not learn:
+
+| **Mice that learn** | **Mice that do not learn** |
+| :------------------ | :------------------------- |
+| CS WT saline | CS Ts65Dn saline |
+| CS WT memantine | SC WT saline |
+| CS Ts65Dn memantine | SC WT memantine |
+|                  | SC Ts65Dn saline |
+|                 | SC Ts65Dn memantine |
+
+From the 8 groups of mice (1,080 in total), the levels of 77 proteins or protein modifications (attributes) were determined to give 83,160 observations, with 1,346 (approximately 1.6%) of the values missing.
+
+# Approach
+
+Using the data described above, potential therapeutic targets will ultimately be proposed. After performing data wrangling, the values will be used in cluster analyses to explore and identify sets of proteins that vary under the different experimental conditions. Statistical analyses will be applied to determine which potential targets display significant differences in expression levels with the varying experimental conditions.
+
+# Deliverables
+
+From the analyses performed, the code, a paper describing the analyses and results, as well as a slide deck will be available to researchers who would like to pursue pharmacotherapies for learning and memory in individuals with Down Syndrome.
