@@ -24,13 +24,23 @@ The dataset includes 8 groups of mice (105-150 mice per group). Wild-type and Ts
 
 | **Mice that learn** | **Mice that do not learn** |
 | :------------------ | :------------------------- |
-| CS WT saline | CS Ts65Dn saline |
-| CS WT memantine | SC WT saline |
-| CS Ts65Dn memantine | SC WT memantine |
-|                  | SC Ts65Dn saline |
-|                 | SC Ts65Dn memantine |
+| CS WT saline        | CS Ts65Dn saline           |
+| CS WT memantine     | SC WT saline               |
+| CS Ts65Dn memantine | SC WT memantine            |
+|                     | SC Ts65Dn saline           |
+|                     | SC Ts65Dn memantine        |
 
 From the 8 groups of mice (1,080 in total), the levels of 77 proteins or protein modifications (attributes) were determined to give 83,160 observations, with 1,346 (approximately 1.6%) of the values missing.
+
+The variables can be defined as the following:
+
+| **Variable**              | **Type**    | **Category details**     |
+| :------------------------ | :---------- | :------------------------|
+| Mouse genotype            | Categorical | control or Ts65Dn mutant |
+| Drug treatment            | Categorical | saline or memantine      |
+| Behavioral assay          | Categorical | CS or SC                 |
+| Learning                  | Categorical | Learn or do not learn    |
+| Protein expression levels | Continuous  |                          |
 
 # Approach
 
@@ -38,4 +48,4 @@ Using the data described above, potential therapeutic targets will ultimately be
 
 # Deliverables
 
-From the analyses performed, the code, a paper describing the analyses and results, as well as a slide deck will be available to researchers who would like to pursue pharmacotherapies for learning and memory in individuals with Down Syndrome.
+From the analyses performed, the code, a paper describing the analyses and results, as well as a slide deck will be available. These deliverables will identify positive relationships between the expression levels of particular proteins and the drug treatment, genotype, or learning and memory. Researchers who would like to pursue pharmacotherapies for learning and memory in individuals with Down Syndrome would be provided with novel potential targets for further research.
