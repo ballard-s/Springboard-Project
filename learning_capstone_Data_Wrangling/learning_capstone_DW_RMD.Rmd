@@ -1,0 +1,64 @@
+---
+title: "learning_capstone_DW_RMD"
+
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Data Wrangling steps and rationale for each step
+
+### 1. The class of the mice was determined by their genotype, drug treatment received, and behavioral treatment. To categorize the class as a numerical value, 'class_number' column was created and each class was assigned a number between 1 and 8.
+
+*# Add class_number column*  
+```{r eval=FALSE}
+learning1 <- learning %>% mutate(class_number = class)
+```
+
+*# Assign Classes to #1-8*  
+```{r eval=FALSE}
+learning1$class_number[learning1$class_number == "c-CS-m"] <- "1"
+learning1$class_number[learning1$class_number == "c-SC-m"] <- "2"
+learning1$class_number[learning1$class_number == "c-CS-s"] <- "3"
+learning1$class_number[learning1$class_number == "c-SC-s"] <- "4"
+learning1$class_number[learning1$class_number == "t-CS-m"] <- "5"
+learning1$class_number[learning1$class_number == "t-SC-m"] <- "6"
+learning1$class_number[learning1$class_number == "t-CS-s"] <- "7"
+learning1$class_number[learning1$class_number == "t-SC-s"] <- "8"
+```
+
+### 2. For each class of mice, their genotype, drug treatment received, and behavioral treatment determined whether they were able to learn or not. A new column (*learning*)  was generated to indicate whether or not the mouse learned, and the mouse was assigned a 1 if it learned or a 0 if it did not learn.
+
+*# Add learning column*  
+```{r eval=FALSE}
+learning1 <- learning1 %>% mutate (learning = class_number)
+```
+
+*# Assign 1 = learn 0 = do not learn*  
+```{r eval=FALSE}
+learning1$learning[learning1$learning == "1"] <- "1"  
+learning1$learning[learning1$learning == "3"] <- "1"  
+learning1$learning[learning1$learning == "5"] <- "1"  
+learning1$learning[learning1$learning == "2"] <- "0"  
+learning1$learning[learning1$learning == "4"] <- "0"  
+learning1$learning[learning1$learning == "6"] <- "0"  
+learning1$learning[learning1$learning == "7"] <- "0"  
+learning1$learning[learning1$learning == "8"] <- "0"  
+```
+
+### 3. Because the dataset contains missing values (NAs), the mean of each class (class number 1-8) was imputed for the columns that ended with '_N', which are the individual proteins whose levels were measured.
+
+*# replace NA values with mean of the corresponding class/class_number*  
+```{r eval=FALSE}
+learning2 <- learning1 %>% group_by(class) %>%
+  mutate_each(funs(replace(., which(is.na(.)), mean(., na.rm=TRUE))), ends_with('_N'))
+```
+
+### 4. A new .csv file was generated to incorporate the changes made to the dataset
+
+*# Create new '.csv' file*  
+```{r eval=FALSE}
+write.csv(learning2, "learning_capstone_DW.csv")
+```
