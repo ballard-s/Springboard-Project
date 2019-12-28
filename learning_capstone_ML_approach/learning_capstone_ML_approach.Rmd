@@ -1,0 +1,25 @@
+---
+title: "learning_capstone_ML_approach"
+
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## The Problem Being Addressed  
+
+**Are there specific relationships between the proteins examined and the various classes of mice?**
+
+This question will be addressed with supervised learning using logistic regression analyses with the goal being to come up with a low-complexity model that can determine whether the expression levels of a particular protein is from a specific class of mice.  
+
+The analyses will focus on the protein levels as being the independent variables and the class number as the dependent variable, as the aim is to be able to predict the categorical variable (class number) based on the expression levels of the proteins.  
+
+The initial analyses will use a two-parameter logistic model. This model will assume that the protein expression levels will account for the class of mice that display those levels. This two-parameter model will utilize combinatorial modeling to determine the optimal goodness-of-fit.  All where all combinations of proteins will be examined for each class number, except when the proteins are in combination with themselves.  
+
+To test the machine learning technique, the models will be run with the lowest AIC for each class, where the AIC measures the goodness-of-fit of the model and the lower the AIC value, the better the model is. If there is a close to perfect fit, then it would be suggested that the measured protein levels would indicate a particular mouse to be categorized in a specific class.  
+
+From these analyses, the goal is to be able to differentiate whether a mouse is within a particular class based on protein expression levels measured.  
+
+
