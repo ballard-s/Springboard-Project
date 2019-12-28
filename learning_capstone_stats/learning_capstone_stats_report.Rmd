@@ -1,0 +1,86 @@
+---
+title: "Learning_capstone_stats report"
+
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Are there significant differences in protein levels between the classes examined?
+
+To begin to address whether there are significant differences in the levels of specific proteins between the different classes examined, the mean protein level was determined for each protein.  
+
+The resulting mean values for each protein in one particular class were plotted against those of another class in a scatter plot matrix (Figure 1) to investigate whether or not there is a positive linear relationship between the different classes.  
+
+If there is a positive linear relationship, this suggests that the protein levels are not different between the classes, which vary by genotype (wild-type vs. mutant), behavioral test given, drug treatment (drug vs. no drug, or any combination of these. If there are mean values that lie outside the positive linear relationship, this may suggest that the potentially significant difference between the protein levels is a result of the variation(s) between the classes examined.  
+
+
+```{r, echo=FALSE, fig.cap="Figure 1. Scatter Plot Matrix by Class", out.width='100%'}
+knitr::include_graphics("Scatter_plot_matrix.png")
+```
+
+From the resulting plot, there appears to be several outliers, or proteins that vary in their mean levels between the classes.  
+
+This leads to the following questions:  
+1. Which protein levels are different between the classes?  
+2. Are these differences statistically significant?  
+
+To address these questions, more data wrangling was performed. The proteins that display a high correlation to one another would theoretically give the same output in comparison with other proteins. Because of this, collinearity was examined, and a correlation matrix between the mean protein levels of each class was generated. The combinations of protein that have a correlation of 0.95 or greater were identified.  
+
+```{r eval=FALSE}
+learning_prot_matrix2[learning_prot_matrix2$cor>=0.95, ]
+
+          row   column       cor            p
+1    DYRK1A_N  ITSN1_N 0.9787557 2.358956e-05
+46   DYRK1A_N   pERK_N 0.9818182 1.482207e-05
+84     pAKT_N   pMEK_N 0.9921192 1.216412e-06
+191  DYRK1A_N   BRAF_N 0.9925721 1.018866e-06
+192   ITSN1_N   BRAF_N 0.9510763 2.821148e-04
+201    pERK_N   BRAF_N 0.9867704 5.731444e-06
+311    pERK_N  GSK3B_N 0.9504556 2.928495e-04
+737    MTOR_N   NR2B_N 0.9840976 9.934136e-06
+1008 pPKCAB_N pGSK3B_N 0.9732252 4.702807e-05
+1640   NUMB_N   GFAP_N 0.9615243 1.383186e-04
+1644   CDK5_N   GFAP_N 0.9785147 2.439721e-05
+2469    ARC_N    pS6_N 1.0000000 0.000000e+00
+2851 DYRK1A_N   CaNA_N 0.9563715 2.008768e-04
+2861   pERK_N   CaNA_N 0.9597956 1.576053e-0
+```
+
+
+In total, 14 combinations were extracted, and from these combinations, 9 proteins were removed.  
+
+After removing all columns except class-number and each protein tested, a repeated measures ANOVA was performed to examine whether the protein levels between classes 1-8 are significantly different. The results were also plotted as a box plot for each protein. From the plots, some ***potential*** general trends were observed:  
+
+* Little to no difference between classes  
+```{r, echo=FALSE, fig.cap="Figure 2. Little to no difference between classes", out.width='100%'}
+knitr::include_graphics("GluR4.png")
+```
+  
+  
+  
+* Differences between genotype  
+```{r, echo=FALSE, fig.cap="Figure 3. Differences between genotypes", out.width='100%'}
+knitr::include_graphics("APP.png")
+```
+  
+  
+  
+* Differences between behavior test given  
+```{r, echo=FALSE, fig.cap="Figure 4. Differences between behavior test given", out.width='100%'}
+knitr::include_graphics("SOD1.png")
+```
+  
+  
+  
+* Differences between drug given and not given  
+```{r, echo=FALSE, fig.cap="Figure 5. Differences between drug and no drug. For example, Class 6 and Class 8 differ only by whether or not the drug was provided.", out.width='100%'}
+knitr::include_graphics("pPKCG.png")
+```
+  
+  
+The p values for the comparisons in protein levels are between either 0 and 0.001 or 0.001 and 0.01.  
+
+Together, these analyses suggest that there are significant differences between at least 2 of the classes for each protein examined. This leads to further questions of whether or not a specific protein and its expression levels can be predicted within one of the 8 classes of proteins. Moreover, it would be interesting to determine and predict the proteins that are affected by particular drugs within individuals of varying genetic and behavioral backgrounds.
