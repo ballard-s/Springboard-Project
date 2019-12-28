@@ -1,0 +1,179 @@
+---
+title: "Data_story_report"
+
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## The Problem Being Addressed  
+
+To better understand how to treat genetic disorders or diseased states, it is important to determine which genes or proteins should be targeted. These targets can be identified by uncovering changes in their expression levels when compared with unaffected individuals. Down Syndrome, or Trisomy 21, which results from an extra copy of chromosome 21, affects approximately 1 in every 700 babies born each year in the United States. The genetic aberrations associated with Down Syndrome can delay the individual’s development, cause deficits in learning and memory, and lead to a higher prevalence of early-onset neurodegenerative disorders, such as Alzheimer’s disease. The proteins and molecular mechanisms that underlie these nervous system defects could serve as potential therapeutic targets. This project proposes to identify these genes.  
+
+## The Data Set  
+
+Protein expression [data](http://archive.ics.uci.edu/ml/datasets/Mice+Protein+Expression) was collected from wild-type mice and a mouse model for Trisomy 21 (Ts65Dn). These data were donated by Dr. Clara Higuera (University Complutense, Madrid, Spain), Dr. Katheleen Gardiner (University of Colorado, Colorado), and Dr. Krzysztof J. Cios (Virginia Commonwealth University, Virginia), and which are available through the UCI Machine Learning Repository.  
+
+The mice in the study underwent one of two learning treatments and were treated with or without memantine, which is an antagonist for the N-methyl-D-aspartate (NMDA) receptor. The NMDA receptor is important for regulating the activity of neurons, and memantine has previously been shown to rescue the performance on learning and memory tasks in Ts65Dn mice.  
+
+The dataset includes 8 groups of mice (105-150 mice per group). Wild-type and Ts65n mutant mice were given injections of either saline or memantine. Fifteen minutes after injection, the mice were placed in one of two behavioral assays. One of the assays was the context-shock (CS) assay, where the mice were placed in a novel cage, allowed to explore for 3 minutes, and then given an electric shock. These mice learned to associate the new environment with the aversive stimulus. The other assay was the shock-context (SC) assay, where the mice were placed in the novel cage, immediately given a shock, and then allowed to explore for 3 minutes. These mice do not develop a conditioned fear like the CS groups. From these assays, the groups of mice can be divided into those that learn and those that do not learn:  
+
+| **Mice that learn** | **Mice that do not learn** |
+| :------------------ | :------------------------- |
+| CS WT saline        | CS Ts65Dn saline           |
+| CS WT memantine     | SC WT saline               |
+| CS Ts65Dn memantine | SC WT memantine            |
+|                     | SC Ts65Dn saline           |
+|                     | SC Ts65Dn memantine        |
+
+From the 8 groups of mice (1,080 in total), the levels of 77 proteins or protein modifications (attributes) were determined to give 83,160 observations, with 1,346 (approximately 1.6%) of the values missing.
+
+The variables can be defined as the following:
+
+| **Variable**              | **Type**    | **Category details**     |
+| :------------------------ | :---------- | :------------------------|
+| Mouse genotype            | Categorical | control or Ts65Dn mutant |
+| Drug treatment            | Categorical | saline or memantine      |
+| Behavioral assay          | Categorical | CS or SC                 |
+| Learning                  | Categorical | Learn or do not learn    |
+| Protein expression levels | Continuous  |                          |  
+
+While the data set provides measurements of 77 different proteins, it does not include information regarding the biological role of these proteins. By knowing which proteins function within the same or parallel biological pathways with other proteins, it is plausible to find a relationship (positive or negative) between the measured levels of the protein in the different classes of mice tested. This may provide useful to hypothesize whether a protein that was not examined would be affected by genotype, drug treatment, or behavioral assay. However, it is noted that novel proteins are continually discovered to play a role in defined biological processes, so the data set and analyses would need to evolve with these new discoveries.  
+
+
+## Data Wrangling  
+
+To begin the data wrangling process, a “class_number” variable was created. Each class was assigned a number between 1 and 8 based on its class, which incorporated the mouse’s genotype, behavioral test given, and whether or not is was given the drug being examined.  
+
+*# Add class_number column*  
+```{r eval=FALSE}
+learning1 <- learning %>% mutate(class_number = class)
+```
+
+*# Assign Classes to #1-8*  
+```{r eval=FALSE}
+learning1$class_number[learning1$class_number == "c-CS-m"] <- "1"
+learning1$class_number[learning1$class_number == "c-SC-m"] <- "2"
+learning1$class_number[learning1$class_number == "c-CS-s"] <- "3"
+learning1$class_number[learning1$class_number == "c-SC-s"] <- "4"
+learning1$class_number[learning1$class_number == "t-CS-m"] <- "5"
+learning1$class_number[learning1$class_number == "t-SC-m"] <- "6"
+learning1$class_number[learning1$class_number == "t-CS-s"] <- "7"
+learning1$class_number[learning1$class_number == "t-SC-s"] <- "8"
+```
+
+Using the class number, another new variable was created to indicate whether or not the mouse learned, which is the read out of the experimenters’ learning and memory assay.  
+
+*# Add learning column*  
+```{r eval=FALSE}
+learning1 <- learning1 %>% mutate (learning = class_number)
+```
+
+*# Assign 1 = learn 0 = do not learn*  
+```{r eval=FALSE}
+learning1$learning[learning1$learning == "1"] <- "1"  
+learning1$learning[learning1$learning == "3"] <- "1"  
+learning1$learning[learning1$learning == "5"] <- "1"  
+learning1$learning[learning1$learning == "2"] <- "0"  
+learning1$learning[learning1$learning == "4"] <- "0"  
+learning1$learning[learning1$learning == "6"] <- "0"  
+learning1$learning[learning1$learning == "7"] <- "0"  
+learning1$learning[learning1$learning == "8"] <- "0"  
+```
+
+
+As mentioned, the data set included 1,346 (approximately 1.6%) NA values. To avoid removing these observations and attributes completely, the mean of each class was imputed for the columns that ended with ‘_N’, which are the individual proteins whose levels were measured. This would provide a representative value for the protein being measured dependent upon each class of mouse examined.  
+
+*# replace NA values with mean of the corresponding class/class_number*  
+```{r eval=FALSE}
+learning2 <- learning1 %>% group_by(class) %>%
+  mutate_each(funs(replace(., which(is.na(.)), mean(., na.rm=TRUE))), ends_with('_N'))
+```
+
+From these wrangling steps, the data set has been cleaned up to begin statistically analyses with the potential for more data wrangling based on the output of the statistics.  
+
+## Initial Findings  
+
+To begin to address whether there are significant differences in the levels of specific proteins between the different classes examined, the mean protein level was determined for each protein.  
+
+The resulting mean values for each protein in one particular class were plotted against those of another class in a scatter plot matrix (Figure 1) to investigate whether or not there is a positive linear relationship between the different classes.  
+
+If there is a positive linear relationship, this suggests that the protein levels are not different between the classes, which vary by genotype (wild-type vs. mutant), behavioral test given, drug treatment (drug vs. no drug, or any combination of these. If there are mean values that lie outside the positive linear relationship, this may suggest that the potentially significant difference between the protein levels is a result of the variation(s) between the classes examined.  
+
+
+```{r, echo=FALSE, fig.cap="Figure 1. Scatter Plot Matrix by Class", out.width='100%'}
+knitr::include_graphics("Scatter_plot_matrix.png")
+```
+
+From the resulting plot, there appears to be several outliers, or proteins that vary in their mean levels between the classes.  
+
+This leads to the following questions:  
+1. Which protein levels are different between the classes?  
+2. Are these differences statistically significant?  
+
+To address these questions, more data wrangling was performed. The proteins that display a high correlation to one another would theoretically give the same output in comparison with other proteins. Because of this, collinearity was examined, and a correlation matrix between the mean protein levels of each class was generated. The combinations of protein that have a correlation of 0.95 or greater were identified.  
+
+```{r eval=FALSE}
+learning_prot_matrix2[learning_prot_matrix2$cor>=0.95, ]
+
+          row   column       cor            p
+1    DYRK1A_N  ITSN1_N 0.9787557 2.358956e-05
+46   DYRK1A_N   pERK_N 0.9818182 1.482207e-05
+84     pAKT_N   pMEK_N 0.9921192 1.216412e-06
+191  DYRK1A_N   BRAF_N 0.9925721 1.018866e-06
+192   ITSN1_N   BRAF_N 0.9510763 2.821148e-04
+201    pERK_N   BRAF_N 0.9867704 5.731444e-06
+311    pERK_N  GSK3B_N 0.9504556 2.928495e-04
+737    MTOR_N   NR2B_N 0.9840976 9.934136e-06
+1008 pPKCAB_N pGSK3B_N 0.9732252 4.702807e-05
+1640   NUMB_N   GFAP_N 0.9615243 1.383186e-04
+1644   CDK5_N   GFAP_N 0.9785147 2.439721e-05
+2469    ARC_N    pS6_N 1.0000000 0.000000e+00
+2851 DYRK1A_N   CaNA_N 0.9563715 2.008768e-04
+2861   pERK_N   CaNA_N 0.9597956 1.576053e-0
+```
+
+
+In total, 14 combinations were extracted, and from these combinations, 9 proteins were removed.  
+
+After removing all columns except class-number and each protein tested, a repeated measures ANOVA was performed to examine whether the protein levels between classes 1-8 are significantly different. The results were also plotted as a box plot for each protein. From the plots, some ***potential*** general trends were observed:  
+
+* Little to no difference between classes  
+```{r, echo=FALSE, fig.cap="Figure 2. Little to no difference between classes", out.width='75%'}
+knitr::include_graphics("GluR4.png")
+```
+  
+  
+  
+* Differences between genotype  
+```{r, echo=FALSE, fig.cap="Figure 3. Differences between genotypes", out.width='75%'}
+knitr::include_graphics("APP.png")
+```
+  
+  
+  
+* Differences between behavior test given  
+```{r, echo=FALSE, fig.cap="Figure 4. Differences between behavior test given", out.width='75%'}
+knitr::include_graphics("SOD1.png")
+```
+  
+  
+  
+* Differences between drug given and not given  
+```{r, echo=FALSE, fig.cap="Figure 5. Differences between drug and no drug. For example, Class 6 and Class 8 differ only by whether or not the drug was provided.", out.width='75%'}
+knitr::include_graphics("pPKCG.png")
+```
+  
+  
+The p values for the comparisons in protein levels are between either 0 and 0.001 or 0.001 and 0.01.  
+
+Together, these analyses suggest that there are significant differences between at least 2 of the classes for each protein examined. This leads to further questions of whether or not a specific protein and its expression levels can be predicted within one of the 8 classes of proteins. Moreover, it would be interesting to determine and predict the proteins that are affected by particular drugs within individuals of varying genetic and behavioral backgrounds.  
+
+## Future Directions  
+
+Given the findings above, a model will be created that will investigate the relationship between the expression levels of a particular protein and each class of mice examined. A logistic regression method will be used to fit a regression curve for the categorical variable class/class_number. The optimal goodness-of-fit will be determined after combinatorial modeling is performed, where all combinations of proteins will be examined for each class number. From this, the goal is to be able to differentiate whether a mouse is within a particular class based on protein expression levels measured.  
+
+In addition, potential therapeutic targets will be proposed. The output from the data wrangling and statistical analyses will be used to explore and identify sets of proteins that vary under the different experimental conditions. The classes that will be focused on are Class 5 and Class 7. Both of these classes are the Ts65Dn mice that were given the learning behavioral test; however, Class 5 was given the drug memantine, while Class 7 was given the control saline. Because of this difference in drug exposure, Class 5 displays more learning than Class 7. Thus, it would be interesting to see if there are any differences in protein expression between these 2 classes. This may suggest a potential therapeutic target or target pathway for aiding in learning and memory for those affected by Down Syndrome.  
+
